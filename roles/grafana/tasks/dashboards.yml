@@ -188,11 +188,11 @@
             owner: "grafana"
             group: "grafana"
             mode: "0755"
-          loop: "{{ __dashboards_subdirs.files | map(attribute='path') | sort | regex_replace(grafana_dashboards_dir + '/*', '') }}"
+          loop: "{{ __dashboards_subdirs.files | map(attribute='path') | sort | map('regex_replace', grafana_dashboards_dir + '/*', '') }}"
           become: true
           register: __dashboards_dir_created
           when: not ansible_check_mode
-          
+
         - name: "Copy dashboard files"
           ansible.builtin.copy:
             src: "{{ item.path }}"
@@ -229,7 +229,7 @@
         state: absent
       loop: "{{ __dashboards_present_list | difference(__dashboards_copied_list) }}"
       become: true
-      when: 
+      when:
         - grafana_provisioning_synced | bool
         - not ansible_check_mode
 
